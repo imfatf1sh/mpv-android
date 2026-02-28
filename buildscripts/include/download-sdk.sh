@@ -4,22 +4,7 @@
 
 . ./include/path.sh # load $os var
 
-[ -z "$IN_CI" ] && IN_CI=0 # skip steps not required for CI?
-[ -z "$WGET" ] && WGET=wget # possibility of calling wget differently
-
 if [ "$os" == "linux" ]; then
-	if [ $IN_CI -eq 0 ]; then
-		if hash yum &>/dev/null; then
-			sudo yum install autoconf pkgconfig libtool ninja-build \
-				unzip wget meson
-		elif apt-get -v &>/dev/null; then
-			sudo apt-get install autoconf pkg-config libtool ninja-build \
-				unzip wget meson
-		else
-			echo "Note: dependencies were not installed, you have to do that manually."
-		fi
-	fi
-
 	if ! javac -version &>/dev/null; then
 		echo "Error: missing Java Development Kit."
 		hash yum &>/dev/null && \
@@ -31,15 +16,6 @@ if [ "$os" == "linux" ]; then
 
 	os_ndk="linux"
 elif [ "$os" == "mac" ]; then
-	if [ $IN_CI -eq 0 ]; then
-		if ! hash brew 2>/dev/null; then
-			echo "Error: brew not found. You need to install Homebrew: https://brew.sh/"
-			exit 255
-		fi
-		brew install \
-			automake autoconf libtool pkg-config \
-			coreutils gnu-sed wget meson ninja
-	fi
 	if ! javac -version &>/dev/null; then
 		echo "Error: missing Java Development Kit. Install it manually."
 		exit 255
@@ -51,7 +27,7 @@ mkdir -p sdk && cd sdk
 # Android SDK
 if [ ! -d "android-sdk-${os}" ]; then
 	echo "Android SDK not found. Downloading commandline tools."
-	$WGET "https://dl.google.com/android/repository/commandlinetools-${os}-${v_sdk}.zip"
+	wget "https://dl.google.com/android/repository/commandlinetools-${os}-${v_sdk}.zip"
 	mkdir "android-sdk-${os}"
 	unzip -q -d "android-sdk-${os}" "commandlinetools-${os}-${v_sdk}.zip"
 	rm "commandlinetools-${os}-${v_sdk}.zip"
@@ -77,7 +53,7 @@ elif [ -z "${os_ndk}" ]; then
 	ln -s "android-sdk-$os/ndk/${v_ndk_n}" "android-ndk-${v_ndk}"
 else
 	echo "Downloading NDK."
-	$WGET "http://dl.google.com/android/repository/android-ndk-${v_ndk}-${os_ndk}.zip"
+	wget "http://dl.google.com/android/repository/android-ndk-${v_ndk}-${os_ndk}.zip"
 	unzip -q "android-ndk-${v_ndk}-${os_ndk}.zip"
 	rm "android-ndk-${v_ndk}-${os_ndk}.zip"
 fi
@@ -88,7 +64,7 @@ fi
 
 # gas-preprocessor
 mkdir -p bin
-$WGET "https://github.com/FFmpeg/gas-preprocessor/raw/master/gas-preprocessor.pl" \
+wget "https://github.com/FFmpeg/gas-preprocessor/raw/master/gas-preprocessor.pl" \
 	-O bin/gas-preprocessor.pl
 chmod +x bin/gas-preprocessor.pl
 
