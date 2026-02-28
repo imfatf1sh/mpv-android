@@ -46,12 +46,8 @@ fi
 # libass
 [ ! -d libass ] && git clone https://github.com/libass/libass
 
-# lua
-if [ ! -d lua ]; then
-	mkdir lua
-	wget https://www.lua.org/ftp/lua-$v_lua.tar.gz -O - | \
-		tar -xz -C lua --strip-components=1
-fi
+# luajit
+[ ! -d luajit ] && git clone https://luajit.org/git/luajit.git -b v$v_luajit
 
 # libplacebo
 [ ! -d libplacebo ] && git clone --recursive https://github.com/haasn/libplacebo
